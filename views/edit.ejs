@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="min-h-screen bg-zinc-900 text-white pt-10 px-10 pb-1">
+      <b
+        ><a href="/logout" class="text-red-800 bg-white px-5 py-3 rounded-md"
+          >Logout</a
+        ></b
+      >
+      <div class="text-3xl pb-1 mt-5"></div>
+      <form action="/update/<%=post._id%>" method="post">
+        <textarea
+          name="textarea"
+          id="textarea"
+          placeholder="Write whats on your mind"
+          class="w-1/3 bg-transparent border-zinc-500 block p-4 border-2 resize-none mb-4 rounded-md"
+        >
+        <%=post.content%>
+        </textarea>
+        <button
+          type="submit"
+          class="bg-yellow-500 text-b px-5 py-3 m-0text-black rounded-md block"
+        >
+          Edit post
+        </button>
+      </form>
+    </div>
+  </body>
+</html>
