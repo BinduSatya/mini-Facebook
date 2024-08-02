@@ -5,7 +5,7 @@ const ejs = require("ejs");
 const bcrypt = require("bcrypt");
 const userModel = require("./models/user.js");
 const jwt = require("jsonwebtoken");
-const user = require("./models/user.js");
+const postModel = require("./models/post.js");
 
 app.set("view engine", "ejs");
 app.use(express.json());
@@ -15,6 +15,16 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
   res.render("create");
 });
+
+const isLoggedIn = async (req, res, next) => {
+  if (req.cookies.token === "") res.redirect("/login");
+  else {
+    const data = jwt.verify(req.cookies.token, "shhhh");
+    const user = await userModel.findOne({ _id: data.userId });
+    req.user = user;
+    next();
+  }
+};
 
 app.post("/register", async (req, res) => {
   try {
@@ -39,7 +49,7 @@ app.post("/register", async (req, res) => {
       "shhhh"
     );
     res.cookie("token", token);
-    res.send("User details saved successfully!");
+    res.redirect("/profile");
   } catch (error) {
     console.log(error);
 
@@ -55,7 +65,7 @@ app.post("/login", async (req, res) => {
   let { email, password } = req.body;
   let user = await userModel.findOne({ email });
   if (!user) return res.status(404).send("user not found");
-  if (bcrypt.compare(password, user.password)) {
+  if (await bcrypt.compare(password, user.password)) {
     let token = jwt.sign(
       { email: email, password: user.password, userId: user._id },
       "shhhh"
@@ -65,24 +75,28 @@ app.post("/login", async (req, res) => {
   } else return res.status(404).send("user not found");
 });
 
+app.post("/create-post", isLoggedIn, async (req, res) => {
+  let user = await userModel.findOne({ email: req.user.email });
+  //   console.log(user)
+  const data = req.body.textarea;
+  let newPost = await postModel.create({
+    user: user._id,
+    content: data,
+  });
+  user.posts.push(newPost._id);
+  await user.save();
+  res.redirect("/profile");
+});
+
 app.get("/logout", (req, res) => {
   res.cookie("token", "");
   res.redirect("/login");
 });
 
-const isLoggedIn = async (req, res, next) => {
-  if (req.cookies.token === "") res.redirect("/login");
-  else {
-    const data = jwt.verify(req.cookies.token, "shhhh");
-    const user = await userModel.findOne({ _id: data.userId });
-    req.user = user;
-    next();
-  }
-};
-
 app.get("/profile", isLoggedIn, (req, res) => {
-  if (!isLoggedIn) res.redirect("/login");
-  res.render("profile");
+  const user = req.user.populate("posts");
+  //   console.log(req.user);
+  res.render("profile", { user });
 });
 
 app.listen(3000, () => {
