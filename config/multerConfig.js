@@ -1,19 +1,21 @@
 const multer = require("multer");
 const path = require("path");
-const crytpo = require("crypto");
+const crypto = require("crypto"); // Corrected typo here
 
+//Disk Storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./public/images/uploads");
   },
   filename: function (req, file, cb) {
-    // const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const name = crytpo.randomBytes(12);
+    const name = crypto.randomBytes(12); // Corrected typo here
     const fn = name.toString("hex") + path.extname(file.originalname);
+    console.log("hoho ", fn);
     cb(null, fn);
   },
 });
 
-const upload = multer({ storage: storage });
+//Export upload variable
+let upload = multer({ storage: storage });
 
-module.exports = upload;
+module.exports = upload;    

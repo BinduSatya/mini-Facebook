@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="min-h-screen bg-zinc-900 text-white pt-10 px-10 pb-1">
+      <h3>Upload Profile Picture</h3>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" />
+        <input
+          class="px-5 py-2 rounded-md bg-blue-500 cursor-pointer"
+          value="Upload File"
+          type="submit"
+        />
+      </form>
+    </div>
+  </body>
+</html>

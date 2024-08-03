@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const userModel = require("./models/user.js");
 const jwt = require("jsonwebtoken");
 const postModel = require("./models/post.js");
-const multerConfig = require("./config/multerConfig.js");
+const upload = require("./config/multerConfig.js");
 const path = require("path");
 
 app.set("view engine", "ejs");
@@ -19,6 +19,10 @@ app.get("/", (req, res) => {
   res.render("create");
 });
 
+app.get("/profile/upload", (req, res) => {
+  res.render("profileupload");
+});
+
 const isLoggedIn = async (req, res, next) => {
   if (req.cookies.token === "") res.redirect("/login");
   else {
@@ -28,6 +32,14 @@ const isLoggedIn = async (req, res, next) => {
     next();
   }
 };
+
+app.post("/upload", isLoggedIn, upload.single("image"), async (req, res) => {
+  console.log(req.file);
+  let user = await userModel.findOne({ email: req.user.email });
+  user.profileImg = req.file.filename;
+  await user.save();
+  res.redirect("/profile");
+});
 
 app.post("/register", async (req, res) => {
   try {
